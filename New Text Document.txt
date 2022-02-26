@@ -1,0 +1,111 @@
+msflexgrid.ocx
+
+Private Sub cmdSetImgType_Click()
+    'User is given the option to select an Image Type for scanning
+    'of black and white, grayscale or color. The option selected
+    'is stored in the global variable ScanType.
+    Const IT_BW = 1
+    Const IT_GRAY8 = 4
+    Const IT_RGB = 16
+    Const CAP_SCAN_IMAGE_TYPE = 100
+    Const CAP_SCAN_IMAGE_TYPES_SUPPORTED = 1
+    Dim varScanImgType As Variant
+    'Global Scantype as integer 
+    'Scanner must be open for Capability check.
+    ImgScan1.OpenScanner 
+    'See what image types the scanner supports.
+    varScanImgType =
+        ImgScan1.GetScanCapability(CAP_SCAN_IMAGE_TYPES_SUPPORTED)
+    If VarType(varScanImgType) = vbError Then
+        MsgBox "Unable to get Supported Image Types"
+    End If 
+    'Find out if the type the user selected is supported;
+    'if so set the capability to that image type
+    Select Case ScanType
+    Case 1
+        If varScanImgType And IT_BW Then
+           ImgScan1.SetScanCapability CAP_SCAN_IMAGE_TYPE, IT_BW
+        Else
+           MsgBox "Black & White image type is not supported by your scanner"
+        End If
+    Case 2
+        If varScanImgType And IT_GRAY8 Then
+           ImgScan1.SetScanCapability CAP_SCAN_IMAGE_TYPE, IT_GRAY8
+        Else
+           MsgBox "Grayscale image type is not supported by your scanner"
+        End If
+    Case 3
+        If varScanImgType And IT_RGB Then
+           ImgScan1.SetScanCapability CAP_SCAN_IMAGE_TYPE, IT_RGB
+        Else
+           MsgBox "Color image type is not supported by your scanner"
+        End If
+    End Select
+End Sub
+
+
+
+=======
+
+
+Private Sub CmdTemplate_Click()
+    ImgScan1.ScanTo = UseFileTemplateOnly '4
+    'Set the image property to a template name.
+    ImgScan1.Image = "C:\image2\img"
+    'MultiPage property must be set to true in order to create
+    'files with more than one page.
+    ImgScan1.MultiPage = True
+    'Create 3 page image files.
+    ImgScan1.PageCount = 3
+    'Do not show the scanner's TWAIN UI.
+    ImgScan1.ShowSetupBeforeScan = False
+    'Scan without using dialog box.
+    ImgScan1.StartScan
+End Sub
+
+
+=======
+
+Private Sub cmdDisplayAndFile_Click()
+    ImgScan1.ScanTo = DisplayAndFile
+    'Set the image property to a file name.
+    ImgScan1.Image = "D:\image2\newpages.tif"
+    'Multipage must be true in order to create files with
+    'more than one page.
+    ImgScan1.MultiPage = True
+    'Do not show the scanner's TWAIN UI.
+    ImgScan1.ShowSetupBeforeScan = False
+    'Scan without using dialog box.
+    ImgScan1.StartScan
+End Sub
+
+======
+
+
+'Example 1
+Private Sub cmdScanToFile_Click()
+    On Error GoTo ScanError   
+    ImgScan1.ScanTo = FileOnly      'Scan to a file
+    ImgScan1.Image = "c:\scan.tif"  'Destination file
+    ImgScan1.StartScan   
+    Exit Sub
+   
+ScanError:
+    MsgBox Err.Description, , "Scan Error"
+    Exit Sub
+End Sub
+
+'Example 2
+Private Sub cmdScanToDisplay_Click()
+    On Error GoTo ScanError   
+    ImgScan1.ScanTo = DisplayAndUseFileTemplate   'Scan to display and template
+    ImgScan1.Image = "c:\img"                     'Template = imgxxxxx.tif
+    ImgScan1.StartScan
+    Exit Sub
+
+ScanError:
+    MsgBox Err.Description, , "Scan Error"
+    Exit Sub
+End Sub
+
+======
